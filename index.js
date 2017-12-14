@@ -24,7 +24,10 @@ const getBitStampRates = (inrRate, finalCallback) => {
       .then(function(res) {
           return res.json();
       }).then(function(json) {
-        values[pairsInr[pairs.indexOf(pair)]] = json['last']*inrRate
+        values[pairsInr[pairs.indexOf(pair)]] = {
+          "ask": json['ask']*inrRate,
+          "bid": json['bid']*inrRate
+        }
         callback()
       }).catch(function(err) {
           callback(err, null)
@@ -49,9 +52,12 @@ const getKoinexRates = (pairs, callback) => {
       for (var key in pairs) {
         ourpairs[key] = {
           "bitstamp": pairs[key],
-          "koinex": json['prices'][key],
-          "koinex/bitstamp": json['prices'][key]/pairs[key],
-          "bitstamp/koinex": pairs[key]/json['prices'][key],
+          "koinex": {
+            "ask": json['stats'][key]["lowest_ask"],
+            "bid": json['stats'][key]["highest_bid"]
+          },
+          "koinex/bitstamp": json['stats'][key]["highest_bid"]/pairs[key]['ask'],
+          "bitstamp/koinex": pairs[key]['bid']/json['stats'][key]["lowest_ask"],
         }
       }
       callback(null, ourpairs)
@@ -82,7 +88,15 @@ app.listen(3000, () => {
       console.log(result)
       const sellMax = getMaxByKey(result, 'koinex/bitstamp')
       const buyMin = getMaxByKey(result, 'bitstamp/koinex')
-      const mostdiff = ((result[buyMin]['bitstamp/koinex'] * result[sellMax]['koinex/bitstamp']) - 1)*100
+      const boughtFromkoinex = (100000/result[buyMin]['koinex']['ask'])
+      const soldRsInBitstamp = (boughtFromkoinex)*result[buyMin]['bitstamp']['bid']
+      const boughtFromBitstamp = (soldRsInBitstamp/result[sellMax]['bitstamp']['ask'])
+      const soldRsInkoinex = boughtFromBitstamp*result[sellMax]['koinex']['bid']
+      console.log(`Buying ${boughtFromkoinex} "${buyMin}" from koinex at Rs ${result[buyMin]['koinex']['ask']} spent 1,00,000 Rs`)
+      console.log(`Selling ${boughtFromkoinex} "${buyMin}" in BitStamp at Rs ${result[buyMin]['bitstamp']['bid']} got ${soldRsInBitstamp} Rs`)
+      console.log(`Buying ${boughtFromBitstamp} "${sellMax}" from BitStamp at Rs ${result[sellMax]['bitstamp']['ask']} spent ${soldRsInBitstamp} Rs`)
+      console.log(`Selling ${boughtFromBitstamp} "${sellMax}" in koinex at Rs ${result[sellMax]['koinex']['bid']} == ${soldRsInkoinex} Rs`)
+      const mostdiff = ((result[buyMin]['bitstamp/koinex']*result[sellMax]['koinex/bitstamp']) - 1)*100
       console.log(`Buy "${buyMin}" from koinex and convert to "${sellMax}" in Bitstamp\nAnd earn - "${mostdiff}%" profit`)
   });
 })
