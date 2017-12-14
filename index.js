@@ -87,6 +87,9 @@ app.get('/api', (req, res, next) => {
     getBitStampRates,
     getKoinexRates
   ],function (err, result) {
+      if(err){
+        res.json({err});
+      }
       console.log(result)
       const sellMax = getMaxByKey(result, 'koinex/bitstamp')
       const buyMin = getMaxByKey(result, 'bitstamp/koinex')
