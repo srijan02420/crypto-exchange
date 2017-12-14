@@ -50,8 +50,8 @@ const getKoinexRates = (pairs, callback) => {
         ourpairs[key] = {
           "bitstamp": pairs[key],
           "koinex": json['prices'][key],
-          "koinex-bitstamp": ((json['prices'][key] - pairs[key])/json['prices'][key])*100,
-          "bitstamp-koinex": ((json['prices'][key] - pairs[key])/pairs[key])*100,
+          "koinex/bitstamp": json['prices'][key]/pairs[key],
+          "bitstamp/koinex": pairs[key]/json['prices'][key],
         }
       }
       callback(null, ourpairs)
@@ -92,9 +92,9 @@ app.listen(3000, () => {
     getKoinexRates
   ],function (err, result) {
       console.log(result)
-      const buyMin = getMinByKey(result, 'koinex-bitstamp')
-      const sellMax = getMaxByKey(result, 'bitstamp-koinex')
-      let mostdiff = (result[buyMin]['bitstamp']/result[buyMin]['koinex']) * (result[sellMax]['koinex']/result[sellMax]['bitstamp'])
+      const buyMin = getMinByKey(result, 'koinex/bitstamp')
+      const sellMax = getMaxByKey(result, 'bitstamp/koinex')
+      const mostdiff = result[buyMin]['koinex/bitstamp'] * result[sellMax]['bitstamp/koinex']
       console.log(`Buy "${buyMin}" from koinex and convert to "${sellMax}" in Bitstamp\nAnd earn - "${mostdiff}%" profit`)
   });
 })
