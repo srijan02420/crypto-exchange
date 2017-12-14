@@ -63,5 +63,10 @@ app.listen(3000, () => {
     getKoinexRates
   ],function (err, result) {
       console.log(result)
+      const keysSorted = Object.keys(result).sort(function(a,b){return result[a]-result[b]})
+      const maxKey = keysSorted[keysSorted.length - 1]
+      const minKey = keysSorted[0]
+      let mostdiff = result[maxKey] - result[minKey]
+      console.log(`Buy "${minKey}" from koinex and convert to "${maxKey}" in Bitstamp\nAnd earn - "${mostdiff}%" profit`)
   });
 })
