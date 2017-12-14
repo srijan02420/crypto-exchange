@@ -58,3 +58,8 @@ typings/
 .env
 
 *-lock.json
+
+.idea/crypto-exchange.iml
+.idea/modules.xml
+.idea/workspace.xml
+.idea/vcs.xml
