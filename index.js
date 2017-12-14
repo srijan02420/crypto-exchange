@@ -79,7 +79,9 @@ const getMaxByKey = (object, key) => {
   return maxKey
 }
 
-app.listen(3000, () => {
+app.use(express.static('public'));
+
+app.get('/api', (req, res, next) => {
   async.waterfall([
     getINRRate,
     getBitStampRates,
@@ -98,5 +100,17 @@ app.listen(3000, () => {
       console.log(`Selling ${boughtFromBitstamp} "${sellMax}" in koinex at Rs ${result[sellMax]['koinex']['bid']} == ${soldRsInkoinex} Rs`)
       const mostdiff = ((result[buyMin]['bitstamp/koinex']*result[sellMax]['koinex/bitstamp']) - 1)*100
       console.log(`Buy "${buyMin}" from koinex and convert to "${sellMax}" in Bitstamp\nAnd earn - "${mostdiff}%" profit`)
+
+      const json = {
+        mostdiff,
+        buyMin,
+        sellMax
+      };
+
+      res.json(json);
   });
-})
+});
+
+app.listen(3000, () => {
+  console.log('serve');
+});
