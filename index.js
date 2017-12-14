@@ -94,7 +94,7 @@ app.listen(3000, () => {
       console.log(result)
       const buyMin = getMinByKey(result, 'koinex-bitstamp')
       const sellMax = getMaxByKey(result, 'bitstamp-koinex')
-      let mostdiff = result[sellMax]['bitstamp-koinex'] - result[buyMin]['koinex-bitstamp']
+      let mostdiff = (result[buyMin]['bitstamp']/result[buyMin]['koinex']) * (result[sellMax]['koinex']/result[sellMax]['bitstamp'])
       console.log(`Buy "${buyMin}" from koinex and convert to "${sellMax}" in Bitstamp\nAnd earn - "${mostdiff}%" profit`)
   });
 })
