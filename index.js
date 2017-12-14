@@ -45,15 +45,44 @@ const getKoinexRates = (pairs, callback) => {
     .then(function(res) {
         return res.json();
     }).then(function(json) {
-      let percentages = {}
+      let ourpairs = {}
       for (var key in pairs) {
-        percentages[key] = ((json['prices'][key] - pairs[key])/pairs[key])*100
+        ourpairs[key] = {
+          "bitstamp": pairs[key],
+          "koinex": json['prices'][key],
+          "koinex-bitstamp": ((json['prices'][key] - pairs[key])/json['prices'][key])*100,
+          "bitstamp-koinex": ((json['prices'][key] - pairs[key])/pairs[key])*100,
+        }
       }
-      callback(null, percentages)
+      callback(null, ourpairs)
     }).catch(function(err) {
         callback(err, null)
         return;
     });
+}
+
+const getMaxByKey = (object, key) => {
+  let maxVal = 0
+  let maxKey = null
+  for (var a in object) {
+    if(object[a][key] > maxVal){
+      maxVal = object[a][key]
+      maxKey = a
+    }
+  }
+  return maxKey
+}
+
+const getMinByKey = (object, key) => {
+  let minVal = Infinity
+  let minKey = null
+  for (var a in object) {
+    if(object[a][key] < minVal){
+      minVal = object[a][key]
+      minKey = a
+    }
+  }
+  return minKey
 }
 
 app.listen(3000, () => {
@@ -63,10 +92,9 @@ app.listen(3000, () => {
     getKoinexRates
   ],function (err, result) {
       console.log(result)
-      const keysSorted = Object.keys(result).sort(function(a,b){return result[a]-result[b]})
-      const maxKey = keysSorted[keysSorted.length - 1]
-      const minKey = keysSorted[0]
-      let mostdiff = result[maxKey] - result[minKey]
-      console.log(`Buy "${minKey}" from koinex and convert to "${maxKey}" in Bitstamp\nAnd earn - "${mostdiff}%" profit`)
+      const buyMin = getMinByKey(result, 'koinex-bitstamp')
+      const sellMax = getMaxByKey(result, 'bitstamp-koinex')
+      let mostdiff = result[sellMax]['bitstamp-koinex'] - result[buyMin]['koinex-bitstamp']
+      console.log(`Buy "${buyMin}" from koinex and convert to "${sellMax}" in Bitstamp\nAnd earn - "${mostdiff}%" profit`)
   });
 })
