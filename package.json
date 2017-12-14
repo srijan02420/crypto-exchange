@@ -1,0 +1,24 @@
+{
+  "name": "crypto-exchnage",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/srijan02420/crypto-exchnage.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/srijan02420/crypto-exchnage/issues"
+  },
+  "homepage": "https://github.com/srijan02420/crypto-exchnage#readme",
+  "dependencies": {
+    "async": "^2.6.0",
+    "express": "^4.16.2",
+    "node-fetch": "^1.7.3"
+  }
+}
