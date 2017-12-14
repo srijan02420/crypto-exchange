@@ -73,18 +73,6 @@ const getMaxByKey = (object, key) => {
   return maxKey
 }
 
-const getMinByKey = (object, key) => {
-  let minVal = Infinity
-  let minKey = null
-  for (var a in object) {
-    if(object[a][key] < minVal){
-      minVal = object[a][key]
-      minKey = a
-    }
-  }
-  return minKey
-}
-
 app.listen(3000, () => {
   async.waterfall([
     getINRRate,
@@ -92,9 +80,9 @@ app.listen(3000, () => {
     getKoinexRates
   ],function (err, result) {
       console.log(result)
-      const buyMin = getMinByKey(result, 'koinex/bitstamp')
-      const sellMax = getMaxByKey(result, 'bitstamp/koinex')
-      const mostdiff = result[buyMin]['koinex/bitstamp'] * result[sellMax]['bitstamp/koinex']
+      const sellMax = getMaxByKey(result, 'koinex/bitstamp')
+      const buyMin = getMaxByKey(result, 'bitstamp/koinex')
+      const mostdiff = ((result[buyMin]['bitstamp/koinex'] * result[sellMax]['koinex/bitstamp']) - 1)*100
       console.log(`Buy "${buyMin}" from koinex and convert to "${sellMax}" in Bitstamp\nAnd earn - "${mostdiff}%" profit`)
   });
 })
